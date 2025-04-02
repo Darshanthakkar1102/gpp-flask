@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<!-- Add AOS library for animations -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+    .material-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    
+    .material-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .material-type-badge {
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.8em;
+        font-weight: 500;
+    }
+    
+    .material-type-lab_manual { background-color: #e3f2fd; color: #1976d2; }
+    .material-type-lecture_notes { background-color: #f3e5f5; color: #7b1fa2; }
+    .material-type-slides { background-color: #e8f5e9; color: #388e3c; }
+    .material-type-gtu_solutions { background-color: #fff3e0; color: #f57c00; }
+    .material-type-revision_notes { background-color: #fce4ec; color: #c2185b; }
+    
+    .dept-section {
+        margin-bottom: 30px;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .dept-header {
+        background: linear-gradient(45deg, #1976d2, #64b5f6);
+        color: white;
+        padding: 20px;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .semester-section {
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .semester-tab {
+        padding: 10px 20px;
+        margin: 0 5px;
+        border-radius: 20px;
+        background-color: #f5f5f5;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .semester-tab.active {
+        background-color: #1976d2;
+        color: white;
+    }
+    
+    .filter-section {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+    
+    .filter-section select {
+        border-radius: 20px;
+        padding: 8px 15px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-section select:focus {
+        border-color: #1976d2;
+        box-shadow: none;
+    }
+    
+    .upload-btn {
+        border-radius: 25px;
+        padding: 10px 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .download-btn {
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-size: 0.9em;
+        transition: all 0.3s ease;
+    }
+    
+    .download-btn:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Loading animation */
+    .loading {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.8);
+        z-index: 1000;
+    }
+    
+    .loading-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    /* Empty state animation */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #9e9e9e;
+    }
+    
+    .empty-state i {
+        font-size: 48px;
+        margin-bottom: 20px;
+        animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-30px); }
+        60% { transform: translateY(-15px); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Page Header -->
+    <div class="row align-items-center mb-4" data-aos="fade-down">
+        <div class="col-md-8">
+            <h2>Study Materials</h2>
+        </div>
+        <div class="col-md-4 text-right">
+            {% if current_user.has_role('faculty') %}
+            <a href="{{ url_for('study_material.upload_material') }}" class="btn btn-primary upload-btn">
+                <i class="fas fa-upload"></i> Upload Material
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-section" data-aos="fade-up">
+        <form method="GET" class="form-inline justify-content-center">
+            <div class="form-group mx-2">
+                <label for="department" class="mr-2">Department:</label>
+                <select name="department" id="department" class="form-control">
+                    <option value="">All Departments</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}" {% if selected_dept == dept.id %}selected{% endif %}>
+                        {{ dept.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group mx-2">
+                <label for="semester" class="mr-2">Semester:</label>
+                <select name="semester" id="semester" class="form-control">
+                    <option value="">All Semesters</option>
+                    {% for i in range(1, 9) %}
+                    <option value="{{ i }}" {% if selected_sem == i %}selected{% endif %}>
+                        Semester {{ i }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Materials by Department -->
+    {% for dept in departments if (not selected_dept or dept.id == selected_dept) %}
+    <div class="dept-section" data-aos="fade-up">
+        <div class="dept-header">
+            <h4><i class="fas fa-building"></i> {{ dept.name }}</h4>
+        </div>
+        
+        {% for sem in range(1, 9) if (not selected_sem or sem == selected_sem) %}
+        {% set sem_materials = materials|selectattr('subject.department_id', 'equalto', dept.id)|selectattr('subject.semester', 'equalto', sem)|list %}
+        {% if sem_materials %}
+        <div class="semester-section" data-aos="fade-up" data-aos-delay="100">
+            <h5 class="mb-4"><i class="fas fa-graduation-cap"></i> Semester {{ sem }}</h5>
+            
+            <div class="row">
+                {% for material in sem_materials %}
+                <div class="col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                    <div class="material-card card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ material.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                {{ material.subject.code }} - {{ material.subject.name }}
+                            </h6>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="material-type-badge material-type-{{ material.material_type }}">
+                                    {{ material.material_type|replace('_', ' ')|title }}
+                                </span>
+                                <a href="{{ url_for('study_material.download_material', id=material.id) }}" 
+                                   class="btn btn-primary download-btn">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </div>
+                            
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-user"></i> 
+                                {{ material.faculty.first_name }} {{ material.faculty.last_name }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" data-aos="fade-up">
+        <i class="fas fa-books"></i>
+        <h4>No study materials found</h4>
+        <p>There are no materials available for the selected filters.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading">
+    <div class="loading-spinner">
+        <i class="fas fa-circle-notch fa-spin fa-3x"></i>
+    </div>
+</div>
+
+{% block scripts %}
+{{ super() }}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+        
+        // Auto-submit form when filters change
+        $('#department, #semester').change(function() {
+            $('.loading').show();
+            $(this).closest('form').submit();
+        });
+        
+        // Show loading on material download
+        $('.download-btn').click(function() {
+            $('.loading').show();
+            setTimeout(function() {
+                $('.loading').hide();
+            }, 2000);
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

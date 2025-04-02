@@ -3,9 +3,11 @@ from app.extensions import db
 from app.models.user import User, Role
 from app.models.department import Department
 from app.models.project import Project
+from app.models.subject import Subject
 from flask_security.utils import hash_password
 from datetime import datetime
 import argparse
+import uuid
 
 app = create_app()
 
@@ -49,23 +51,26 @@ def create_admin():
         admin_user = User.query.filter_by(email=admin_email).first()
         
         if not admin_user:
+            # Create admin user
             admin_user = User(
                 email=admin_email,
-                password=hash_password('admin123'),  # Default password
+                password=hash_password('admin123'),
                 active=True,
-                is_approved=True,
+                fs_uniquifier=str(uuid.uuid4()),
+                confirmed_at=datetime.utcnow(),
                 first_name='Admin',
                 last_name='User',
-                confirmed_at=datetime.utcnow(),
-                roles=[admin_role]
+                is_approved=True,
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow()
             )
+            admin_user.roles.append(admin_role)
             db.session.add(admin_user)
             db.session.commit()
-            print(f"Admin user created successfully with email: {admin_email}")
-            print("Default password: admin123")
+            print("Admin user created successfully!")
             return True
         else:
-            print("Admin user already exists")
+            print("Admin user already exists!")
             return True
 
 def create_departments():
@@ -92,92 +97,89 @@ def create_departments():
         db.session.commit()
         print("Sample departments created successfully!")
 
-def create_sample_projects():
-    """Create sample projects for Computer Engineering department."""
+def create_subjects():
+    """Create sample subjects."""
     with app.app_context():
         # Get Computer Engineering department
-        dept = Department.query.filter_by(name='Computer Engineering').first()
-        if not dept:
-            print("Error: Computer Engineering department not found. Please create departments first.")
+        comp_dept = Department.query.filter_by(name='Computer Engineering').first()
+        if not comp_dept:
+            print("Error: Computer Engineering department not found.")
             return False
 
-        # Sample projects
-        projects = [
+        sample_subjects = [
             {
-                'name': 'Smart Library Management System',
-                'description': 'Developing a digital library management system with RFID integration for efficient book tracking and management.',
-                'department_id': dept.id,
-                'group_leader': 'Raj Patel',
-                'members': 'Raj Patel, Priya Shah, Amit Kumar, Neha Singh',
-                'marks': None,
-                'presentation_type': 'Demo Model',
-                'semester': '6th Sem',
-                'faculty_mentor': 'Dr. Mehta',
-                'mobile_number': '9876543210',
-                'submission_timestamp': datetime.now()
+                'code': 'CS101',
+                'name': 'Introduction to Programming',
+                'semester': 1,
+                'department_id': comp_dept.id
             },
             {
-                'name': 'IoT Weather Station',
-                'description': 'Building a weather monitoring station using IoT sensors to collect and analyze environmental data.',
-                'department_id': dept.id,
-                'group_leader': 'Meera Desai',
-                'members': 'Meera Desai, Jay Mehta, Ravi Sharma, Anjali Patel',
-                'marks': None,
-                'presentation_type': 'Demo Model',
-                'semester': '6th Sem',
-                'faculty_mentor': 'Prof. Shah',
-                'mobile_number': '9876543211',
-                'submission_timestamp': datetime.now()
+                'code': 'CS201',
+                'name': 'Data Structures',
+                'semester': 2,
+                'department_id': comp_dept.id
             },
             {
-                'name': 'Student Attendance App',
-                'description': 'Mobile application for tracking student attendance using biometric authentication.',
-                'department_id': dept.id,
-                'group_leader': 'Kunal Shah',
-                'members': 'Kunal Shah, Pooja Patel, Rohan Joshi, Sneha Kumar',
-                'marks': None,
-                'presentation_type': 'Demo Model',
-                'semester': '6th Sem',
-                'faculty_mentor': 'Dr. Patel',
-                'mobile_number': '9876543212',
-                'submission_timestamp': datetime.now()
+                'code': 'CS301',
+                'name': 'Database Management Systems',
+                'semester': 3,
+                'department_id': comp_dept.id
             },
             {
-                'name': 'College Event Portal',
-                'description': 'Web portal for managing college events, registrations, and generating attendance certificates.',
-                'department_id': dept.id,
-                'group_leader': 'Anita Desai',
-                'members': 'Anita Desai, Rahul Patel, Kiran Shah, Maya Singh',
-                'marks': None,
-                'presentation_type': 'Demo Model',
-                'semester': '6th Sem',
-                'faculty_mentor': 'Prof. Kumar',
-                'mobile_number': '9876543213',
-                'submission_timestamp': datetime.now()
-            },
-            {
-                'name': 'Lab Equipment Tracker',
-                'description': 'System to track and manage laboratory equipment, maintenance schedules, and usage logs.',
-                'department_id': dept.id,
-                'group_leader': 'Vikram Mehta',
-                'members': 'Vikram Mehta, Nisha Patel, Arun Kumar, Divya Shah',
-                'marks': None,
-                'presentation_type': 'Demo Model',
-                'semester': '6th Sem',
-                'faculty_mentor': 'Dr. Singh',
-                'mobile_number': '9876543214',
-                'submission_timestamp': datetime.now()
+                'code': 'CS401',
+                'name': 'Operating Systems',
+                'semester': 4,
+                'department_id': comp_dept.id
             }
         ]
 
-        # Add projects to database
-        for project_data in projects:
-            project = Project.query.filter_by(name=project_data['name']).first()
+        for subject_data in sample_subjects:
+            subject = Subject.query.filter_by(code=subject_data['code']).first()
+            if not subject:
+                subject = Subject(**subject_data)
+                db.session.add(subject)
+                print(f"Added subject: {subject_data['code']} - {subject_data['name']}")
+
+        db.session.commit()
+        print("Sample subjects created successfully!")
+        return True
+
+def create_sample_projects():
+    """Create sample projects."""
+    with app.app_context():
+        # Get Computer Engineering department
+        comp_dept = Department.query.filter_by(name='Computer Engineering').first()
+        if not comp_dept:
+            print("Error: Computer Engineering department not found.")
+            return False
+
+        sample_projects = [
+            {
+                'title': 'AI-Powered Attendance System',
+                'description': 'An attendance system using facial recognition and machine learning.',
+                'status': 'ongoing',
+                'department_id': comp_dept.id
+            },
+            {
+                'title': 'Smart Parking System',
+                'description': 'IoT-based parking system with real-time space detection.',
+                'status': 'completed',
+                'department_id': comp_dept.id
+            },
+            {
+                'title': 'Student Performance Analytics',
+                'description': 'Data analytics platform for tracking and improving student performance.',
+                'status': 'pending',
+                'department_id': comp_dept.id
+            }
+        ]
+
+        for project_data in sample_projects:
+            project = Project.query.filter_by(title=project_data['title']).first()
             if not project:
                 project = Project(**project_data)
                 db.session.add(project)
-                print(f"Added project: {project_data['name']}")
-        
+
         db.session.commit()
         print("Sample projects created successfully!")
         return True
@@ -188,6 +190,7 @@ def init_all():
     init_base()
     if create_admin():
         create_departments()
+        create_subjects()
         create_sample_projects()
     print("Database initialization complete!")
 
@@ -197,6 +200,7 @@ if __name__ == '__main__':
     parser.add_argument('--base', action='store_true', help='Initialize base database structure only')
     parser.add_argument('--admin', action='store_true', help='Create admin user only')
     parser.add_argument('--departments', action='store_true', help='Create departments only')
+    parser.add_argument('--subjects', action='store_true', help='Create sample subjects only')
     parser.add_argument('--projects', action='store_true', help='Create sample projects only')
     
     args = parser.parse_args()
@@ -211,5 +215,7 @@ if __name__ == '__main__':
             create_admin()
         if args.departments:
             create_departments()
+        if args.subjects:
+            create_subjects()
         if args.projects:
             create_sample_projects()

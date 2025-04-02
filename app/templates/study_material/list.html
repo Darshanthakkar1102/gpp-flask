@@ -2,74 +2,104 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Study Materials</h2>
-        {% if current_user.has_role('faculty') %}
-        <a href="{{ url_for('study_material.upload_material') }}" class="btn btn-primary">Upload Material</a>
-        {% endif %}
-    </div>
-
     <div class="row mb-4">
-        <div class="col-md-6">
-            <select class="form-control" id="subjectFilter" onchange="updateFilters()">
-                <option value="">All Subjects</option>
-                {% for subject in subjects %}
-                <option value="{{ subject.id }}" {% if subject.id == current_subject %}selected{% endif %}>
-                    {{ subject.code }} - {{ subject.name }}
-                </option>
-                {% endfor %}
-            </select>
+        <div class="col-md-8">
+            <h2>Study Materials</h2>
         </div>
-        <div class="col-md-6">
-            <select class="form-control" id="typeFilter" onchange="updateFilters()">
-                <option value="">All Types</option>
-                <option value="lab_manual" {% if current_type == 'lab_manual' %}selected{% endif %}>Lab Manual</option>
-                <option value="lecture_notes" {% if current_type == 'lecture_notes' %}selected{% endif %}>Lecture Notes</option>
-                <option value="slides" {% if current_type == 'slides' %}selected{% endif %}>PowerPoint Slides</option>
-                <option value="gtu_solutions" {% if current_type == 'gtu_solutions' %}selected{% endif %}>GTU Paper Solutions</option>
-                <option value="revision_notes" {% if current_type == 'revision_notes' %}selected{% endif %}>Revision Notes</option>
-            </select>
+        <div class="col-md-4 text-right">
+            {% if current_user.has_role('faculty') %}
+            <a href="{{ url_for('study_material.upload_material') }}" class="btn btn-primary">
+                <i class="fas fa-upload"></i> Upload Material
+            </a>
+            {% endif %}
         </div>
     </div>
 
-    <div class="row">
-        {% for material in materials %}
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ material.title }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ material.subject.code }} - {{ material.subject.name }}</h6>
-                    <p class="card-text">
-                        <span class="badge badge-primary">{{ material.material_type|replace('_', ' ')|title }}</span>
-                        <small class="text-muted ml-2">Uploaded by {{ material.faculty.name }} on {{ material.upload_date.strftime('%Y-%m-%d') }}</small>
-                    </p>
-                    {% if material.description %}
-                    <p class="card-text">{{ material.description }}</p>
-                    {% endif %}
-                    <a href="{{ url_for('study_material.download_material', id=material.id) }}" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-download"></i> Download
-                    </a>
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="form-inline">
+                <div class="form-group mx-2">
+                    <label for="department" class="mr-2">Department:</label>
+                    <select name="department" id="department" class="form-control">
+                        <option value="">All Departments</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}" {% if selected_dept == dept.id %}selected{% endif %}>
+                            {{ dept.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
-            </div>
+                <div class="form-group mx-2">
+                    <label for="semester" class="mr-2">Semester:</label>
+                    <select name="semester" id="semester" class="form-control">
+                        <option value="">All Semesters</option>
+                        {% for i in range(1, 9) %}
+                        <option value="{{ i }}" {% if selected_sem == i %}selected{% endif %}>
+                            Semester {{ i }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
         </div>
-        {% else %}
-        <div class="col-12">
-            <div class="alert alert-info">No study materials found.</div>
-        </div>
-        {% endfor %}
     </div>
+
+    {% for dept in departments if (not selected_dept or dept.id == selected_dept) %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>{{ dept.name }}</h4>
+        </div>
+        <div class="card-body">
+            {% for sem in range(1, 9) if (not selected_sem or sem == selected_sem) %}
+            {% set sem_materials = materials|selectattr('subject.department_id', 'equalto', dept.id)|selectattr('subject.semester', 'equalto', sem)|list %}
+            {% if sem_materials %}
+            <h5>Semester {{ sem }}</h5>
+            <div class="table-responsive mb-4">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Subject</th>
+                            <th>Type</th>
+                            <th>Uploaded By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for material in sem_materials %}
+                        <tr>
+                            <td>{{ material.title }}</td>
+                            <td>{{ material.subject.code }} - {{ material.subject.name }}</td>
+                            <td>{{ material.material_type|replace('_', ' ')|title }}</td>
+                            <td>{{ material.faculty.first_name }} {{ material.faculty.last_name }}</td>
+                            <td>
+                                <a href="{{ url_for('study_material.download_material', id=material.id) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
 </div>
 
 {% block scripts %}
+{{ super() }}
 <script>
-function updateFilters() {
-    const subject = document.getElementById('subjectFilter').value;
-    const type = document.getElementById('typeFilter').value;
-    let url = new URL(window.location.href);
-    url.searchParams.set('subject_id', subject);
-    url.searchParams.set('type', type);
-    window.location.href = url.toString();
-}
+    $(document).ready(function() {
+        // Auto-submit form when filters change
+        $('#department, #semester').change(function() {
+            $(this).closest('form').submit();
+        });
+    });
 </script>
 {% endblock %}
 {% endblock %}

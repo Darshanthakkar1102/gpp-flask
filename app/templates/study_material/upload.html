@@ -8,26 +8,85 @@
         <div class="card-body">
             <form method="POST" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
-                <div class="form-group">
-                    {{ render_field(form.title, class="form-control") }}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ render_field(form.department, class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ render_field(form.semester, class="form-control") }}
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    {{ render_field(form.description, class="form-control") }}
-                </div>
-                <div class="form-group">
-                    {{ render_field(form.material_type, class="form-control") }}
-                </div>
+
                 <div class="form-group">
                     {{ render_field(form.subject, class="form-control") }}
                 </div>
+
+                <div class="form-group">
+                    {{ render_field(form.title, class="form-control") }}
+                </div>
+
+                <div class="form-group">
+                    {{ render_field(form.description, class="form-control") }}
+                </div>
+
+                <div class="form-group">
+                    {{ render_field(form.material_type, class="form-control") }}
+                </div>
+
                 <div class="form-group">
                     {{ render_field(form.file, class="form-control-file") }}
+                    <small class="form-text text-muted">Allowed file types: PDF, DOC, DOCX, PPT, PPTX</small>
                 </div>
+
                 <div class="form-group">
                     {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ url_for('study_material.list_materials') }}" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+{% block scripts %}
+{{ super() }}
+<script>
+    function updateSubjects() {
+        var departmentId = $('#department').val();
+        var semester = $('#semester').val();
+        
+        if (departmentId && semester) {
+            $.getJSON("{{ url_for('study_material.get_subjects') }}", {
+                department_id: departmentId,
+                semester: semester
+            }, function(data) {
+                var subjectSelect = $('#subject');
+                subjectSelect.empty();
+                
+                // Add default option
+                subjectSelect.append($('<option>', {
+                    value: '',
+                    text: '-- Select Subject --'
+                }));
+                
+                // Add subjects from response
+                $.each(data, function(i, item) {
+                    subjectSelect.append($('<option>', {
+                        value: item.id,
+                        text: item.name
+                    }));
+                });
+            });
+        }
+    }
+
+    $(document).ready(function() {
+        // Update subjects when department or semester changes
+        $('#department, #semester').change(updateSubjects);
+    });
+</script>
 {% endblock %}

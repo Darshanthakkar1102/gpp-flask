@@ -5,213 +5,77 @@
     <div class="col-md-12">
         <h2>Admin Dashboard</h2>
         
-        <!-- Navigation Tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active">
-                <a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">
-                    <i class="fas fa-clock"></i> Pending Approvals
-                    {% if pending_users %}
-                        <span class="badge">{{ pending_users|length }}</span>
-                    {% endif %}
-                </a>
-            </li>
-            <li role="presentation">
-                <a href="#students" aria-controls="students" role="tab" data-toggle="tab">
-                    <i class="fas fa-user-graduate"></i> Students
-                </a>
-            </li>
-            <li role="presentation">
-                <a href="#lecturers" aria-controls="lecturers" role="tab" data-toggle="tab">
-                    <i class="fas fa-chalkboard-teacher"></i> Lecturers
-                </a>
-            </li>
-            <li role="presentation">
-                <a href="#departments" aria-controls="departments" role="tab" data-toggle="tab">
-                    <i class="fas fa-building"></i> Departments
-                </a>
-            </li>
-            <li role="presentation">
-                <a href="#hods" aria-controls="hods" role="tab" data-toggle="tab">
-                    <i class="fas fa-user-tie"></i> HODs
-                </a>
-            </li>
-            <li role="presentation">
-                <a href="#lab_assistants" aria-controls="lab_assistants" role="tab" data-toggle="tab">
-                    <i class="fas fa-flask"></i> Lab Assistants
-                </a>
-            </li>
-            <li role="presentation">
-                <a href="#librarians" aria-controls="librarians" role="tab" data-toggle="tab">
-                    <i class="fas fa-book-reader"></i> Librarians
-                </a>
-            </li>
-            <li role="presentation">
-                <a href="#store_officers" aria-controls="store_officers" role="tab" data-toggle="tab">
-                    <i class="fas fa-store"></i> Store Officers
-                </a>
-            </li>
-            <li role="presentation">
-                <a href="#projects" aria-controls="projects" role="tab" data-toggle="tab">
-                    <i class="fas fa-project-diagram"></i> Projects
-                </a>
-            </li>
-        </ul>
+        <div class="nav nav-tabs" role="tablist">
+            <a class="nav-link" href="#pending" role="tab" data-toggle="tab">
+                <i class="fas fa-clock"></i> Pending Approvals
+                {% if pending_users %}
+                    <span class="badge">{{ pending_users|length }}</span>
+                {% endif %}
+            </a>
+            <a class="nav-link" href="#students" role="tab" data-toggle="tab">
+                <i class="fas fa-user-graduate"></i> Students
+            </a>
+            <a class="nav-link" href="#study_materials" role="tab" data-toggle="tab">
+                <i class="fas fa-book"></i> Study Materials
+            </a>
+            <a class="nav-link" href="#projects" role="tab" data-toggle="tab">
+                <i class="fas fa-project-diagram"></i> Projects
+            </a>
+        </div>
 
-        <!-- Tab Content -->
-        <div class="tab-content">
-            <!-- Pending Approvals Tab -->
-            <div role="tabpanel" class="tab-pane active" id="pending">
-                <div class="panel panel-warning">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Pending Approvals</h3>
-                    </div>
-                    <div class="panel-body">
-                        {% if pending_users %}
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Email</th>
-                                        <th>Name</th>
-                                        <th>Role</th>
-                                        <th>Department</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for user in pending_users %}
-                                    <tr>
-                                        <td>{{ user.email }}</td>
-                                        <td>{{ user.first_name }} {{ user.last_name }}</td>
-                                        <td>{{ user.roles[0].name if user.roles else 'No role' }}</td>
-                                        <td>{{ user.department }}</td>
-                                        <td>
-                                            <form style="display: inline;" method="POST" action="{{ url_for('admin.approve_user', user_id=user.id) }}">
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                <button type="submit" class="btn btn-success btn-sm">
-                                                    <i class="fas fa-check"></i> Approve
-                                                </button>
-                                            </form>
-                                            <form style="display: inline;" method="POST" action="{{ url_for('admin.reject_user', user_id=user.id) }}">
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="fas fa-times"></i> Reject
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        {% else %}
-                        <p>No pending approvals.</p>
-                        {% endif %}
+        <!-- Quick Actions -->
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <a href="{{ url_for('study_material.upload_material') }}" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Upload Study Material
+                </a>
+                <a href="{{ url_for('study_material.list_materials') }}" class="btn btn-info">
+                    <i class="fas fa-list"></i> View Study Materials
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mt-4">
+            <!-- User Management Card -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">User Management</h5>
+                        <p class="card-text">Create, edit, and manage users</p>
+                        <a href="#" class="btn btn-primary" onclick="showTab('students')">Manage Users</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Students Tab -->
-            <div role="tabpanel" class="tab-pane" id="students">
-                {% include "admin/tabs/students.html" %}
+            <!-- Study Materials Card -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Study Materials</h5>
+                        <p class="card-text">Upload and manage study materials</p>
+                        <a href="{{ url_for('study_material.list_materials') }}" class="btn btn-primary">Manage Materials</a>
+                    </div>
+                </div>
             </div>
 
-            <!-- Lecturers Tab -->
-            <div role="tabpanel" class="tab-pane" id="lecturers">
-                {% include "admin/tabs/lecturers.html" %}
-            </div>
-
-            <!-- Departments Tab -->
-            <div role="tabpanel" class="tab-pane" id="departments">
-                {% include "admin/tabs/departments.html" %}
-            </div>
-
-            <!-- HODs Tab -->
-            <div role="tabpanel" class="tab-pane" id="hods">
-                {% include "admin/tabs/hods.html" %}
-            </div>
-
-            <!-- Lab Assistants Tab -->
-            <div role="tabpanel" class="tab-pane" id="lab_assistants">
-                {% include "admin/tabs/lab_assistants.html" %}
-            </div>
-
-            <!-- Librarians Tab -->
-            <div role="tabpanel" class="tab-pane" id="librarians">
-                {% include "admin/tabs/librarians.html" %}
-            </div>
-
-            <!-- Store Officers Tab -->
-            <div role="tabpanel" class="tab-pane" id="store_officers">
-                {% include "admin/tabs/store_officers.html" %}
-            </div>
-
-            <!-- Projects Tab -->
-            <div role="tabpanel" class="tab-pane" id="projects">
-                {% include "admin/tabs/projects.html" %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">User Management</h5>
-                <p class="card-text">Create, edit, and manage users</p>
-                <a href="{{ url_for('admin.create_user') }}" class="btn btn-primary">Create User</a>
-                <a href="{{ url_for('admin.bulk_upload') }}" class="btn btn-secondary">Bulk Upload</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Results Management</h5>
-                <p class="card-text">Upload and manage GTU exam results</p>
-                <a href="{{ url_for('admin.upload_results') }}" class="btn btn-primary">Upload Results</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h4 class="card-title">Results Management</h4>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    <a href="{{ url_for('admin.upload_results') }}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-upload"></i> Upload Results
-                    </a>
-                    <a href="{{ url_for('admin.view_results') }}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-table"></i> View Results
-                    </a>
+            <!-- Results Card -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Results Management</h5>
+                        <p class="card-text">Upload and manage GTU exam results</p>
+                        <a href="#" class="btn btn-primary">Manage Results</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-{% block scripts %}
-{{ super() }}
 <script>
-    // Activate tab based on hash in URL
-    $(document).ready(function() {
-        var hash = window.location.hash;
-        if (hash) {
-            $('.nav-tabs a[href="' + hash + '"]').tab('show');
-        }
-
-        // Update hash when tab is changed
-        $('.nav-tabs a').click(function(e) {
-            $(this).tab('show');
-            var scrollmem = $('body').scrollTop();
-            window.location.hash = this.hash;
-            $('html,body').scrollTop(scrollmem);
-        });
-    });
+function showTab(tabId) {
+    $('.nav-tabs a[href="#' + tabId + '"]').tab('show');
+}
 </script>
-{% endblock %}
-
 {% endblock %}
