@@ -22,16 +22,19 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
-    fs_uniquifier = db.Column(db.String(255), unique=True, default=lambda: str(uuid.uuid4()))
+    fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
     confirmed_at = db.Column(db.DateTime())
     
     # Profile fields
+    name = db.Column(db.String(100))
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
     phone = db.Column(db.String(20))
+    enrollment_no = db.Column(db.String(20), unique=True)
+    semester = db.Column(db.Integer)
     
     # Department relationship
-    department_id = db.Column(db.Integer, db.ForeignKey('departments.id', name='fk_user_department'))
+    department_id = db.Column(db.Integer, db.ForeignKey('department.id'))
     
     # Approval fields
     is_approved = db.Column(db.Boolean, default=False)
@@ -43,7 +46,7 @@ class User(db.Model, UserMixin):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    roles = db.relationship('Role', secondary=roles_users,
+    roles = db.relationship('Role', secondary='roles_users',
                           backref=db.backref('users', lazy='dynamic'))
     approved_by = db.relationship('User', remote_side=[id],
                                 backref='approved_users')
