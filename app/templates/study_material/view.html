@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('study_material.list_materials') }}">Study Materials</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ material.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ material.title }}</h2>
+            <h6 class="card-subtitle mb-3 text-muted">
+                {{ material.subject.code }} - {{ material.subject.name }}
+                <span class="badge badge-primary ml-2">{{ material.material_type|replace('_', ' ')|title }}</span>
+            </h6>
+            
+            {% if material.description %}
+            <p class="card-text">{{ material.description }}</p>
+            {% endif %}
+            
+            <div class="mt-4">
+                <p><strong>Uploaded by:</strong> {{ material.faculty.name }}</p>
+                <p><strong>Upload Date:</strong> {{ material.upload_date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            </div>
+            
+            <a href="{{ url_for('study_material.download_material', id=material.id) }}" class="btn btn-primary">
+                <i class="fas fa-download"></i> Download Material
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

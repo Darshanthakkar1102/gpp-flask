@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from '_macros.html' import render_field %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Upload Study Material</h2>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ render_field(form.title, class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ render_field(form.description, class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ render_field(form.material_type, class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ render_field(form.subject, class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ render_field(form.file, class="form-control-file") }}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

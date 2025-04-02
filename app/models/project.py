@@ -1,29 +1,22 @@
-from app import db
+from app.extensions import db
 from datetime import datetime
 
 class Project(db.Model):
     __tablename__ = 'projects'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
-    department_id = db.Column(db.Integer, db.ForeignKey('departments.id', name='fk_project_department'))
-    group_leader = db.Column(db.String(100), nullable=False)
-    members = db.Column(db.Text, nullable=False)  # Comma-separated list of members
-    marks = db.Column(db.Integer)  # Out of 100
-    presentation_type = db.Column(db.String(50))  # Model/Poster
-    semester = db.Column(db.String(20))
-    faculty_mentor = db.Column(db.String(100))
-    mobile_number = db.Column(db.String(15))
-    submission_timestamp = db.Column(db.DateTime)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
+    start_date = db.Column(db.DateTime, default=datetime.utcnow)
+    end_date = db.Column(db.DateTime)
+    status = db.Column(db.String(50), default='pending')  # pending, ongoing, completed, cancelled
+    department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=False)
+    
     # Relationships
-    department = db.relationship('Department', backref=db.backref('projects', lazy=True))
-
+    department = db.relationship('Department', backref='projects')
+    
     def __repr__(self):
-        return f'<Project {self.name}>'
+        return f'<Project {self.title}>'
 
     @staticmethod
     def import_from_csv(file_path):
@@ -37,7 +30,7 @@ class Project(db.Model):
         # Column mapping from Google Form to our model
         column_mapping = {
             'Timestamp': 'submission_timestamp',
-            'Project Title': 'name',
+            'Project Title': 'title',
             'Write about your Idea/project ': 'description',  
             'Demo Model  / Poster ': 'presentation_type',  
             'Select Branch ': 'department',  
@@ -73,7 +66,7 @@ class Project(db.Model):
             timestamp = datetime.strptime(row['Timestamp'], '%m/%d/%Y %H:%M:%S')
             
             project = Project(
-                name=row['Project Title'].strip(),
+                title=row['Project Title'].strip(),
                 description=row['Write about your Idea/project '].strip(),  
                 department_id=dept.id,
                 group_leader=row['First team member name  (for certificate printing)'].strip(),
