@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, Length
 class StudyMaterialForm(FlaskForm):
     department = SelectField('Department', coerce=int, validators=[DataRequired()])
     semester = SelectField('Semester', 
-                         choices=[(i, f"Semester {i}") for i in range(1, 9)],
+                         choices=[(i, f"Semester {i}") for i in range(1, 6)],
                          coerce=int,
                          validators=[DataRequired()])
     title = StringField('Title', validators=[DataRequired(), Length(max=200)])

@@ -78,21 +78,23 @@ def create_departments():
     departments = [
         'Computer Engineering',
         'Mechanical Engineering',
+        'EC (Electronics & Communication)',
+        'IT (Information Technology)',
         'Civil Engineering',
         'Electrical Engineering',
-        'Chemical Engineering',
-        'Electronics Engineering',
-        'Information Technology',
-        'Automobile Engineering'
+        'ICT (Information and Communication Technology)'
     ]
     
     with app.app_context():
+        # First, delete all existing departments
+        Department.query.delete()
+        db.session.commit()
+        
+        # Then add our new departments
         for dept_name in departments:
-            dept = Department.query.filter_by(name=dept_name).first()
-            if not dept:
-                dept = Department(name=dept_name)
-                db.session.add(dept)
-                print(f"Added department: {dept_name}")
+            dept = Department(name=dept_name)
+            db.session.add(dept)
+            print(f"Added department: {dept_name}")
         
         db.session.commit()
         print("Sample departments created successfully!")
@@ -114,8 +116,20 @@ def create_subjects():
                 'department_id': comp_dept.id
             },
             {
+                'code': 'CS102',
+                'name': 'Digital Electronics',
+                'semester': 1,
+                'department_id': comp_dept.id
+            },
+            {
                 'code': 'CS201',
                 'name': 'Data Structures',
+                'semester': 2,
+                'department_id': comp_dept.id
+            },
+            {
+                'code': 'CS202',
+                'name': 'Computer Networks',
                 'semester': 2,
                 'department_id': comp_dept.id
             },
@@ -126,9 +140,45 @@ def create_subjects():
                 'department_id': comp_dept.id
             },
             {
+                'code': 'CS302',
+                'name': 'Object Oriented Programming',
+                'semester': 3,
+                'department_id': comp_dept.id
+            },
+            {
                 'code': 'CS401',
                 'name': 'Operating Systems',
                 'semester': 4,
+                'department_id': comp_dept.id
+            },
+            {
+                'code': 'CS402',
+                'name': 'Software Engineering',
+                'semester': 4,
+                'department_id': comp_dept.id
+            },
+            {
+                'code': 'CS501',
+                'name': 'Web Development',
+                'semester': 5,
+                'department_id': comp_dept.id
+            },
+            {
+                'code': 'CS502',
+                'name': 'Artificial Intelligence',
+                'semester': 5,
+                'department_id': comp_dept.id
+            },
+            {
+                'code': 'CS601',
+                'name': 'Cloud Computing',
+                'semester': 6,
+                'department_id': comp_dept.id
+            },
+            {
+                'code': 'CS602',
+                'name': 'Project Management',
+                'semester': 6,
                 'department_id': comp_dept.id
             }
         ]
