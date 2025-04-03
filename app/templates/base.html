@@ -9,79 +9,279 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        .navbar-brand {
-            font-weight: bold;
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --card-bg: #f8f9fa;
+            --input-bg: #ffffff;
+            --input-border: #ddd;
+            --panel-bg: #ffffff;
+            --panel-border: #ddd;
+            --btn-primary: #007bff;
+            --btn-hover: #0056b3;
+            --link-color: #007bff;
         }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --card-bg: #2d2d2d;
+            --input-bg: #333333;
+            --input-border: #444444;
+            --panel-bg: #2d2d2d;
+            --panel-border: #444444;
+            --btn-primary: #0d6efd;
+            --btn-hover: #0b5ed7;
+            --link-color: #6ea8fe;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .navbar {
+            background-color: #111827;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .container-fluid {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .navbar-brand {
+            color: #ffffff !important;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            padding: 0.5rem 0;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            height: 100%;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.95) !important;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 1rem 1.5rem !important;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            position: relative;
+            background: linear-gradient(to bottom, transparent 0%, transparent 100%);
+        }
+
+        .nav-link:hover {
+            color: #ffffff !important;
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-1px);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+        }
+
+        .theme-toggle {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #ffffff;
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: 12px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            margin-left: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .theme-toggle:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                height: 70px;
+            }
+
+            .container-fluid {
+                padding: 0 1.5rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+            
+            .nav-link {
+                font-size: 1.1rem;
+                padding: 0.75rem 1rem !important;
+            }
+
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 1.2rem;
+            }
+
+            .nav-wrapper {
+                gap: 1rem;
+            }
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border-color: var(--panel-border);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .panel-heading {
+            background-color: var(--card-bg);
+            border-color: var(--panel-border);
+            color: var(--text-color);
+        }
+
+        .form-control {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-color);
+        }
+
+        .form-control:focus {
+            background-color: var(--input-bg);
+            border-color: var(--btn-primary);
+            color: var(--text-color);
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--btn-primary);
+            border-color: var(--btn-primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--btn-hover);
+            border-color: var(--btn-hover);
+        }
+
+        a {
+            color: var(--link-color);
+        }
+
+        .gap-3 {
+            gap: 1rem;
+        }
+
         .alert {
             margin-top: 20px;
             margin-bottom: 20px;
         }
+
         .content-section {
             padding: 20px;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
-        .form-control {
-            height: 42px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            box-shadow: none;
-            padding: 8px 12px;
-        }
-        .form-control:focus {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-        }
-        .btn-primary {
+
+        .btn {
             padding: 10px 20px;
             font-size: 16px;
             font-weight: 500;
+            transition: all 0.3s ease;
         }
+
         .panel {
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 50px;
         }
+
         .panel-heading {
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
-            background-color: #f8f9fa;
-            padding: 15px 20px;
+            padding: 20px;
         }
+
         .panel-title {
             font-size: 24px;
+            margin: 0;
+        }
+
+        .panel-body {
+            padding: 30px;
+        }
+
+        .panel-footer {
+            background-color: var(--card-bg);
+            border-color: var(--panel-border);
+            padding: 15px;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .checkbox label {
+            color: var(--text-color);
         }
     </style>
 {% endblock %}
 
 {% block navbar %}
-    <nav class="navbar navbar-default">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">GPP</a>
+            <div class="nav-wrapper">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.has_role('admin') %}
+                        <a class="nav-link" href="{{ url_for('admin.index') }}">Admin</a>
+                    {% endif %}
+                    <a class="nav-link" href="{{ url_for('security.logout') }}">Logout</a>
+                {% else %}
+                    <a class="nav-link" href="{{ url_for('security.login') }}">Login</a>
+                {% endif %}
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
                 </button>
-                <a class="navbar-brand" href="{{ url_for('main.index') }}">GPP</a>
-            </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    {% if current_user.is_authenticated %}
-                        <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
-                        {% if current_user.has_role('admin') %}
-                            <li><a href="{{ url_for('admin.index') }}">Admin</a></li>
-                        {% endif %}
-                    {% endif %}
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    {% if current_user.is_authenticated %}
-                        <li><a href="{{ url_for('security.logout') }}">Logout</a></li>
-                    {% else %}
-                        <li><a href="{{ url_for('security.login') }}">Login</a></li>
-                    {% endif %}
-                </ul>
             </div>
         </div>
     </nav>
@@ -99,9 +299,35 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-
         {% block app_content %}{% endblock %}
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const icon = themeToggle.querySelector('i');
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                updateIcon(savedTheme === 'dark');
+            }
+
+            themeToggle.addEventListener('click', function() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateIcon(newTheme === 'dark');
+            });
+
+            function updateIcon(isDark) {
+                icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        });
+    </script>
 {% endblock %}
 
 {% block scripts %}
