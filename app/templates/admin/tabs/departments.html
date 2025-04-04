@@ -52,8 +52,24 @@
                             <td>{{ department.id }}</td>
                             <td>{{ department.name }}</td>
                             <td>{{ department.hod.email if department.hod else 'Not Assigned' }}</td>
-                            <td>{{ department.users|selectattr('roles.0.name', 'equalto', 'student')|list|length }}</td>
-                            <td>{{ department.users|selectattr('roles.0.name', 'equalto', 'lecturer')|list|length }}</td>
+                            <td>
+                                {% set student_count = 0 %}
+                                {% for user in department.users %}
+                                    {% if user.roles and user.roles|length > 0 and user.roles[0].name == 'student' %}
+                                        {% set student_count = student_count + 1 %}
+                                    {% endif %}
+                                {% endfor %}
+                                {{ student_count }}
+                            </td>
+                            <td>
+                                {% set lecturer_count = 0 %}
+                                {% for user in department.users %}
+                                    {% if user.roles and user.roles|length > 0 and user.roles[0].name == 'lecturer' %}
+                                        {% set lecturer_count = lecturer_count + 1 %}
+                                    {% endif %}
+                                {% endfor %}
+                                {{ lecturer_count }}
+                            </td>
                             <td>
                                 <button class="btn btn-sm btn-primary" onclick="editDepartment('{{ department.id }}')">
                                     <i class="fas fa-edit"></i> Edit

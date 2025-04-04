@@ -30,6 +30,9 @@
                             </div>
                             <div class="panel-body">
                                 <div class="list-group">
+                                    <a href="{{ url_for('auth.edit_profile') }}" class="list-group-item">
+                                        <i class="fas fa-user-edit"></i> Edit Profile
+                                    </a>
                                     <a href="{{ url_for('security.change_password') }}" class="list-group-item">
                                         <i class="fas fa-key"></i> Change Password
                                     </a>

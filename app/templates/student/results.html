@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block app_content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">My Results</h3>
+                </div>
+                <div class="panel-body">
+                    {% if results %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Exam Name</th>
+                                    <th>Date</th>
+                                    <th>Semester</th>
+                                    <th>SGPA</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>{{ result.exam_name }}</td>
+                                    <td>{{ result.declaration_date.strftime('%d-%m-%Y') }}</td>
+                                    <td>{{ result.semester }}</td>
+                                    <td>{{ result.sgpa }}</td>
+                                    <td>
+                                        {% if result.result_status == 'PASS' %}
+                                        <span class="label label-success">Pass</span>
+                                        {% else %}
+                                        <span class="label label-danger">Fail</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('main.view_result_details', result_id=result.id) }}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View Details
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No results available yet.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_security import Security, SQLAlchemyUserDatastore
+from flask_security import SQLAlchemyUserDatastore
 from flask_security.utils import hash_password
-from .extensions import db, mail, csrf, bootstrap, migrate
+from .extensions import db, mail, csrf, bootstrap, migrate, security
 from .models.user import User, Role
 from .models.department import Department
 from .models.project import Project
@@ -22,7 +22,7 @@ def create_app(config_class=Config):
 
     # Setup Flask-Security
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-    security = Security(app, user_datastore)
+    security.init_app(app, user_datastore)
 
     # Register blueprints
     from .routes.main import bp as main_bp

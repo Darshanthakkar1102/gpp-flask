@@ -12,7 +12,7 @@
                 <div class="profile-info mb-4">
                     <dl class="dl-horizontal">
                         <dt>Role</dt>
-                        <dd>{{ current_user.roles[0].name|title }}</dd>
+                        <dd>{{ current_user.roles[0].name|title if current_user.roles else 'User' }}</dd>
                         <dt>Department</dt>
                         <dd>{{ current_user.department }}</dd>
                         <dt>Status</dt>

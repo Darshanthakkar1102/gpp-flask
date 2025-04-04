@@ -13,18 +13,24 @@ class Config:
 
     # Flask-Security-Too configuration
     SECURITY_PASSWORD_SALT = os.getenv('SECURITY_PASSWORD_SALT', 'salt-change-in-production')
-    SECURITY_REGISTERABLE = True
+    SECURITY_REGISTERABLE = False  # We use our custom registration
     SECURITY_RECOVERABLE = True
     SECURITY_CHANGEABLE = True
     SECURITY_CONFIRMABLE = False  # Disable email confirmation
     SECURITY_SEND_REGISTER_EMAIL = False  # Disable registration email
+    SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False  # Disable password change email
     SECURITY_USERNAME_ENABLE = False  # We're using email as the main identifier
-    SECURITY_POST_REGISTER_VIEW = 'security.login'
-    SECURITY_POST_LOGIN_VIEW = '/dashboard'
-    SECURITY_POST_LOGOUT_VIEW = '/'
+    SECURITY_URL_PREFIX = None
+    SECURITY_LOGIN_URL = '/auth/login'
+    SECURITY_LOGOUT_URL = '/auth/logout'
+    SECURITY_CHANGE_URL = '/auth/change-password'
+    SECURITY_POST_LOGIN_VIEW = 'dashboard.index'
+    SECURITY_POST_LOGOUT_VIEW = 'auth.login'
+    SECURITY_POST_CHANGE_VIEW = 'dashboard.index'
     SECURITY_TOKEN_MAX_AGE = 3600  # 1 hour
     SECURITY_RESET_PASSWORD_WITHIN = '1 days'
     SECURITY_TWO_FACTOR = False
+    SECURITY_BLUEPRINT_NAME = 'security'
 
     # Email configuration
     MAIL_SERVER = os.getenv('MAIL_SERVER')

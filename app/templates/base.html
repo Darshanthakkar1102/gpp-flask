@@ -275,9 +275,10 @@
                     {% if current_user.has_role('admin') %}
                         <a class="nav-link" href="{{ url_for('admin.index') }}">Admin</a>
                     {% endif %}
-                    <a class="nav-link" href="{{ url_for('security.logout') }}">Logout</a>
+                    <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
                 {% else %}
-                    <a class="nav-link" href="{{ url_for('security.login') }}">Login</a>
+                    <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                    <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
                 {% endif %}
                 <button class="theme-toggle" id="theme-toggle">
                     <i class="fas fa-moon"></i>

@@ -1,43 +1,66 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-<div class="container mt-4">
-    <h2>Student Dashboard</h2>
-    
-    <div class="row mt-4">
-        <!-- Profile Card -->
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Profile</h4>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Welcome, {{ current_user.email }}</h4>
+            <div class="alert alert-info">
+                Welcome to your dashboard! You are logged in as a user.
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Profile Information</h3>
                 </div>
-                <div class="card-body">
-                    <p><strong>Name:</strong> {{ current_user.name }}</p>
-                    <p><strong>Student ID:</strong> {{ current_user.student_id }}</p>
-                    <p><strong>Email:</strong> {{ current_user.email }}</p>
+                <div class="panel-body">
+                    <table class="table table-hover">
+                        <tr>
+                            <td><strong>Email:</strong></td>
+                            <td>{{ current_user.email }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Name:</strong></td>
+                            <td>{{ current_user.first_name }} {{ current_user.last_name|default('None None', true) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phone:</strong></td>
+                            <td>{{ current_user.phone|default('Not provided', true) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Department:</strong></td>
+                            <td>{{ current_user.department.name if current_user.department else 'Not assigned' }}</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- Results Card -->
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Results</h4>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Quick Actions</h3>
                 </div>
-                <div class="card-body">
+                <div class="panel-body">
                     <div class="list-group">
-                        <a href="{{ url_for('student.my_results') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-graduation-cap"></i> View My Results
+                        <a href="{{ url_for('security.change_password') }}" class="list-group-item">
+                            <i class="fas fa-key"></i> Change Password
                         </a>
                         {% if latest_result %}
-                        <a href="{{ url_for('student.view_result', exam_id=latest_result.exam_id) }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-star"></i> Latest Result ({{ latest_result.exam_name }})
-                            <span class="badge {% if latest_result.result_status == 'PASS' %}bg-success{% else %}bg-danger{% endif %} float-end">
+                        <a href="{{ url_for('main.view_results') }}" class="list-group-item">
+                            <i class="fas fa-graduation-cap"></i> Latest Result ({{ latest_result.exam_name }})
+                            <span class="badge {% if latest_result.result_status == 'PASS' %}bg-success{% else %}bg-danger{% endif %}">
                                 {{ latest_result.result_status }}
                             </span>
                         </a>
                         {% endif %}
+                        <a href="{{ url_for('main.view_results') }}" class="list-group-item">
+                            <i class="fas fa-list"></i> View All Results
+                        </a>
                     </div>
                 </div>
             </div>

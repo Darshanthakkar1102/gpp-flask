@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block app_content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Result Details - {{ result.exam_name }}
+                        <a href="{{ url_for('main.view_results') }}" class="btn btn-default btn-sm pull-right">
+                            <i class="fas fa-arrow-left"></i> Back to Results
+                        </a>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-hover">
+                                <tr>
+                                    <td><strong>Student Name:</strong></td>
+                                    <td>{{ current_user.first_name }} {{ current_user.last_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Student ID:</strong></td>
+                                    <td>{{ current_user.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Department:</strong></td>
+                                    <td>{{ current_user.department.name if current_user.department else 'Not assigned' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-hover">
+                                <tr>
+                                    <td><strong>Exam Type:</strong></td>
+                                    <td>{{ result.exam_type }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Declaration Date:</strong></td>
+                                    <td>{{ result.declaration_date.strftime('%d-%m-%Y') }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td>
+                                        {% if result.result_status == 'PASS' %}
+                                        <span class="label label-success">Pass</span>
+                                        {% else %}
+                                        <span class="label label-danger">Fail</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Result Details</h4>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject Code</th>
+                                            <th>Subject Name</th>
+                                            <th>Credits</th>
+                                            <th>Grade Points</th>
+                                            <th>Grade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if result.subject_results %}
+                                            {% for subject in result.subject_results %}
+                                            <tr>
+                                                <td>{{ subject.code }}</td>
+                                                <td>{{ subject.name }}</td>
+                                                <td>{{ subject.credits }}</td>
+                                                <td>{{ subject.grade_points }}</td>
+                                                <td>{{ subject.grade }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="5" class="text-center">No subject-wise results available</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="info">
+                                            <th colspan="2">Total</th>
+                                            <th>{{ result.total_credits }}</th>
+                                            <th>{{ result.total_grade_points }}</th>
+                                            <th>SGPA: {{ result.sgpa }}</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 text-center mt-4">
+                            <a href="#" class="btn btn-primary" onclick="window.print()">
+                                <i class="fas fa-print"></i> Print Result
+                            </a>
+                            <a href="#" class="btn btn-success" onclick="downloadPDF()">
+                                <i class="fas fa-download"></i> Download PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

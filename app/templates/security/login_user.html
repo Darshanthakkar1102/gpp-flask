@@ -1,72 +1,76 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block app_content %}
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <div class="panel panel-default">
-            <div class="panel-heading text-center">
-                <h3 class="panel-title">Welcome Back!</h3>
-                <p class="text-muted" style="margin-top: 10px;">Please login to your account</p>
-            </div>
-            <div class="panel-body">
-                <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
-                    {{ login_user_form.hidden_tag() }}
-                    
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fas fa-envelope"></i></span>
-                            {{ login_user_form.email(class="form-control", placeholder="Enter your email") }}
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fas fa-lock"></i></span>
-                            {{ login_user_form.password(class="form-control", placeholder="Enter your password") }}
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-xs-6">
-                                <div class="checkbox">
-                                    <label>
-                                        {{ login_user_form.remember }} Remember Me
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-xs-6 text-right">
-                                <a href="{{ url_for('security.forgot_password') }}" class="forgot-password">
-                                    Forgot Password?
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{ login_user_form.submit(class="btn btn-primary btn-block btn-lg") }}
-                </form>
-            </div>
-            <div class="panel-footer text-center">
-                <p style="margin: 0;">Don't have an account? <a href="{{ url_for('security.register') }}">Register here</a></p>
-            </div>
+<div class="col-md-4 col-md-offset-4">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Please Sign In</h3>
+        </div>
+        <div class="panel-body">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-info">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form action="{{ url_for('auth.login') }}" method="POST" name="login_user_form">
+                {{ login_user_form.hidden_tag() }}
+                <div class="form-group">
+                    {{ login_user_form.email.label }}
+                    {{ login_user_form.email(class="form-control", placeholder="Enter your email") }}
+                    {% if login_user_form.email.errors %}
+                        {% for error in login_user_form.email.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ login_user_form.password.label }}
+                    {{ login_user_form.password(class="form-control", placeholder="Enter your password") }}
+                    {% if login_user_form.password.errors %}
+                        {% for error in login_user_form.password.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ login_user_form.role.label }}
+                    {{ login_user_form.role(class="form-control") }}
+                    {% if login_user_form.role.errors %}
+                        {% for error in login_user_form.role.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ login_user_form.remember }}
+                    {{ login_user_form.remember.label }}
+                </div>
+                {{ login_user_form.submit(class="btn btn-primary btn-block") }}
+            </form>
+        </div>
+        <div class="panel-footer text-center">
+            <p style="margin: 0;">Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a></p>
         </div>
     </div>
 </div>
+{% endblock %}
 
 <style>
     .input-group-addon {
-        background-color: var(--card-bg);
-        border-color: var(--input-border);
-        color: var(--text-color);
+        min-width: 40px;
+        text-align: center;
     }
     
     .forgot-password {
-        display: inline-block;
-        padding-top: 7px;
+        font-size: 13px;
     }
     
-    .btn-lg {
-        margin-top: 10px;
+    .checkbox {
+        margin-top: 0;
     }
     
     .text-muted {
@@ -74,4 +78,3 @@
         opacity: 0.7;
     }
 </style>
-{% endblock %}
